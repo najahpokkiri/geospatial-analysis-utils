@@ -1,0 +1,323 @@
+---
+title: "bands_eds"
+output: html_document
+date: '2022-08-01'
+---
+
+
+
+```{r}
+library(tidyverse)
+
+library(here)
+
+```
+
+
+```{r}
+
+# reading 500 points file
+
+random_points = read.csv("~/work/internships/meghna/LT05_L1TP_145044_20100428_20161016_01_T1/145044_20100428_indices/random_points_indices_data.csv")
+
+```
+
+
+```{r}
+unique(random_points['class_label'])
+
+
+```
+
+
+
+```{r}
+## adding labels to the df
+
+# cats = factor(c('Forest', 'Forest Fire', 'Forest Active Fire', 'Ag', "Ag Fire", 'Ag Active Fire', 'Shadow',
+#                   'Water', 'Cloud', 'No Data','Others', 'Eutro', 'Unknown'), 
+#               levels = c('Forest', 'Forest Fire', 'Forest Active Fire', 'Ag', "Ag Fire", 'Ag Active Fire', 'Shadow',
+#                   'Water', 'Cloud', 'No Data','Others', 'Eutro', 'Unknown')
+#                  )
+# numbers = seq(1,13,1)
+# 
+# labels = data.frame("class_label" =cats,"class" =numbers)
+# 
+# random_points = merge(random_points, labels, by = "class")
+# 
+# head(sample_df)
+```
+
+
+
+```{r}
+
+# melting the df for viz
+bands_df = random_points[,c('class_label','b1', 'b2', 'b3', 'b4', 'b5', 'b7')] %>% 
+  pivot_longer(cols = -class_label, names_to = "bands")
+
+head(bands_df)
+
+bands_spectra = bands_df %>% group_by(class_label, bands) %>% 
+  summarise(mean = mean(value, na.rm = TRUE)) %>%  ungroup()
+
+
+head(bands_spectra)
+```
+
+
+```{r}
+## theme for line charts
+
+
+theme_line <-  theme_minimal()+
+  theme(plot.margin = unit(c(.5,.5,.5,.5), "cm"),
+        legend.position = "bottom",
+        plot.background = element_blank(),
+        #plot.title = element_text( size = 18, family = "serif"),
+        plot.subtitle = element_text( size = 15,color = "grey50",
+                                     margin = margin(t = 0, r = 0, b = 20, l = 0)),
+        text = element_text(color = "gray20",family = "serif"),
+        axis.text.x = element_text( 
+                                   hjust = .5, vjust = 0),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12),
+        axis.text = element_text(face = "italic", size = 10),
+        #axis.title = element_text(vjust = -1, size = 13),        
+        axis.ticks = element_blank(),
+        panel.grid.major = element_line(color = "gray", size = .5),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank(),
+         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+       # axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.line.x = element_line(),
+        axis.title.x = element_blank()
+  )
+```
+
+
+```{r}
+
+
+## color for spectra
+
+
+spectra = c('Forest' = 'darkgreen',
+            'Forest Fire' = "darkorange1", 
+            'Ag'  = 'chartreuse4', 
+            "Ag Fire" = "darkorange3",
+           
+            'Shadow' = "black",
+             'Water' = "lightblue",
+           'Others' = '#E69F00',
+            
+            'Unknown' = 'grey',
+           'Confused Burn' = 'brown', 
+          
+           'Leaf fallen off' = 'lightgreen',
+           'Ag with no crop' = 'blue')
+
+```
+
+```{r}
+
+# bands spectra viz
+
+bands_spectral_line<- ggplot(data =bands_spectra, aes(x = bands, y = mean, group = class_label, color = class_label))+
+  
+   geom_line( )+
+  geom_point(color = "black", size = .5)+
+  #scale_color_brewer(palette = 'Dark2')
+  scale_color_manual(values = spectra)+
+  labs(title = "Spectral Signatures of the Training Points", y = 'Surface Reflectance', y = 'Bands')+
+  theme(legend.position = "bottom",
+        axis.title.x = element_blank(),
+        legend.title = element_blank())
+
+
+
+ggsave("~/work/internships/meghna/fire_images/bands_spectra.png",
+       plot = bands_spectral_line,
+        width = 8, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+
+```
+
+
+## indices viz
+
+```{r}
+
+ggplot(subset(random_points %>% filter(class_label!= 'No Data')), aes(y = ndvi, x = class_label))+
+  geom_boxplot()
+```
+
+
+
+
+```{r}
+
+# melting the df for viz
+indices_df = random_points[,c('class_label','ndvi', 'ndmi', 'nbr', 'bai', 'baims', 'baiml', 'mirbi', 'gemi')] %>% 
+  pivot_longer(cols = -class_label, names_to = "indices") %>% 
+  filter(class_label != 'No Data')
+
+head(bands_df)
+
+indices_avg = indices_df %>% group_by(class_label, indices) %>% 
+  summarise(mean = mean(value, na.rm = TRUE)) %>%  ungroup()
+
+
+head(indices_avg)
+```
+
+```{r}
+
+## output function
+
+
+
+indice_list = c('ndvi', 'ndmi', 'nbr', 'bai', 'baims', 'baiml', 'mirbi', 'gemi')
+
+
+
+for (indice    in unique(indices_avg$indices)) {
+  ggplot(subset(indices_df %>% filter(indices %in% c(indice))),
+        aes(x = class_label, y = value, fill = class_label))+
+  geom_boxplot()+
+  labs (y = "Value")+theme(legend.position = "NA", axis.title.x = element_blank(), legend.title = element_blank(),
+                           axis.text.x = element_text(angle = 45,  hjust = 1))+
+  scale_fill_manual(values = spectra)
+  ggsave(paste0("~/work/internships/meghna/fire_images/", indice,".png"),
+   width = 5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+}
+```
+
+
+
+------------
+
+
+
+<!-- ```{r} -->
+
+<!-- baisl <- ggplot(subset(indices_avg %>% filter(indices %in% c( 'baiml', 'baims'))), -->
+<!--         aes(x = class_label, y = mean, color = indices, group = indices))+ -->
+<!--   geom_line()+ -->
+<!--   labs(y = 'Average Value')+ -->
+<!-- scale_color_brewer(palette="Dark2")+ -->
+<!--   theme(legend.position = "bottom", -->
+<!--         axis.title.x = element_blank()) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!--  bai<- ggplot(subset(indices_avg %>% filter(indices %in% c( 'bai'))), -->
+<!--         aes(x = class_label, y = mean, color = indices, group = indices))+ -->
+<!--   geom_line()+ -->
+<!--   labs(y = 'Average Value')+ -->
+<!-- scale_color_brewer(palette="Dark2")+ -->
+<!--   theme(legend.position = "bottom", -->
+<!--         axis.title.x = element_blank()) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- mirbi <- ggplot(subset(indices_avg %>% filter(indices %in% c( 'mirbi'))), -->
+<!--         aes(x = class_label, y = mean, group =1))+ -->
+<!--   geom_line()+ -->
+<!--   geom_point()+ -->
+<!--   labs (y = "Avg. value")+ -->
+<!--   scale_color_manual(values=c("#56B4E9"))+ -->
+<!--     theme(legend.position = "bottom", -->
+<!--         axis.title.x = element_blank()) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- normIndice <- ggplot(subset(indices_avg %>% filter(indices %in% c('ndvi', 'gemi', 'nbr', 'ndmi'))), -->
+<!--         aes(x = class_label, y = mean, color = indices, group = indices))+ -->
+<!--   geom_line()+ -->
+<!--   scale_color_brewer(palette="Dark2")+ -->
+<!--   labs (y = "Avg. value")+ -->
+<!--   theme(legend.position = "bottom", -->
+<!--         axis.title.x = element_blank()) -->
+<!-- ``` -->
+
+
+<!-- ## patch up -->
+<!-- ```{r} -->
+<!-- library(patchwork) -->
+<!-- norm_mir = normIndice / mirbi -->
+
+<!-- bai_baisl = bai /baisl -->
+
+<!-- ggsave("./fire_presentation/bai_baisl.png", -->
+<!--        plot = bai_baisl, -->
+<!--         width = 8, height = 6, -->
+<!--        dpi = 300, -->
+<!--        bg='#ffffff') -->
+
+<!-- ggsave("./fire_presentation/norm_mir.png", -->
+<!--        plot = norm_mir, -->
+<!--         width = 8, height = 6, -->
+<!--        dpi = 300, -->
+<!--        bg='#ffffff') -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- ggplot(random_points, aes(x = cla)) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- ggplot(subset(indices_df %>% filter(indices %in% c('ndvi'))), -->
+<!--         aes(x = class_label, y = value))+ -->
+<!--   geom_boxplot()+ -->
+<!--   facet_wrap(~indices, scales = 'free') -->
+<!--   labs (y = "Avg. value")+ -->
+<!--   theme(legend.position = "bottom") -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- ggsave("./fire_presentation/norm_mir.png", -->
+<!--        plot = norm_mir, -->
+<!--         width = 8, height = 6, -->
+<!--        dpi = 300, -->
+<!--        bg='#ffffff') -->
+<!-- ``` -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+
+<!-- ## output function -->
+<!-- indice_list = c('ndvi', 'ndmi', 'nbr', 'bai', 'baims', 'baiml', 'mirbi', 'gemi') -->
+
+<!-- for (indice in indice_list ) { -->
+<!--   ggsave(plot = indice, file=paste0("./fire_presentation/", indice,".png"),width = 5,      height = 4, dpi = 300,bg='#ffffff') -->
+<!-- } -->
+
+<!-- for (indice in indice_list ) { -->
+<!-- file=paste0("./fire_presentation/", indice,".png") -->
+<!-- print(file) -->
+<!-- } -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- for (indice    in unique(indices_avg$indices)) { -->
+<!--   ggplot(subset(indices_avg %>% filter(indices ==indice)), aes(x = class_label, y = mean, group = 1))+geom_line()+geom_point()+labs (y = "Avg. value")+theme(legend.position = "bottom", axis.title.x = element_blank()) -->
+<!--   ggsave(paste0("./fire_presentation/", indice,".png"), -->
+<!--    width = 5, height = 4, -->
+<!--        dpi = 300, -->
+<!--        bg='#ffffff') -->
+<!-- } -->
+<!-- ``` -->
+
+
+
+
+

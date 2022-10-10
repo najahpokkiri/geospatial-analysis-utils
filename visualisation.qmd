@@ -1,0 +1,417 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+In this document I am trying to visualize the raster images using gglpot
+
+### Loading files
+
+```{r setup, include=FALSE}
+print(getwd())
+knitr::opts_knit$set(root.dir ="/Users/najah/work/internships/meghna/LT05_L1TP_145044_20100428_20161016_01_T1")
+print(getwd())
+
+```
+
+```{r knitr::root.dir("Users/najah/work/internships/meghna/LT05_L1TP_145044_20100428_20161016_01_T1/")}
+
+# knitr::root.dir("Users/najah/work/internships/meghna/LT05_L1TP_145044_20100428_20161016_01_T1/")
+
+```
+
+```{r}
+
+#setwd("Users/najah/work/internships/meghna/LT05_L1TP_145044_20100428_20161016_01_T1/")
+
+library(raster)
+"rgdal_show_exportToProj4_warnings"="none"
+library(rgdal)
+library(ggplot2)
+library(stars)
+
+```
+
+#### reading rasters
+
+```{r}
+theme_set(theme_bw())
+
+theme_for_map <- theme(
+  axis.ticks = element_blank(),
+  axis.text= element_blank(), 
+  axis.line = element_blank(),
+  panel.border = element_blank(),
+  panel.grid.major = element_line(color='transparent'),
+  panel.grid.minor = element_line(color='transparent'),
+  panel.background = element_blank(),
+  plot.background = element_rect(fill = "transparent",color='transparent'),
+  legend.title = element_blank(),
+  axis.title = element_blank(),
+  plot.title = element_text(hjust = .55, vjust = -5, family = 'serif'),
+  legend.position = c(.96,.18),
+  legend.key.size = unit(.5, 'cm'), #change legend key size
+  legend.key.height = unit(.5, 'cm'), #change legend key height
+  legend.key.width = unit(.5, 'cm'), #change legend key width
+  legend.text = element_text(size=5) #change legend text font size
+)
+```
+
+#### ndvi
+
+```{r}
+ndvi_raster <- read_stars("./145044_20100428_indices/python/145044_20100428_ndvi.tif")
+plot(ndvi_raster)
+
+```
+
+```{r }
+
+## ndvi plotting
+
+breaks = unname(quantile(ndvi_raster[["145044_20100428_ndvi.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+
+#breaks = append(breaks, c(.01), after = 1) 
+
+library(scales)
+
+ndvi <- ggplot()+
+  geom_stars(data = ndvi_raster, downsample = 2)+
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+
+ scale_fill_fermenter(palette = "Spectral", breaks = round(breaks,2),direction = 1,
+                      na.value=NA)+
+  theme_for_map +
+  labs(title = 'NDVI')
+
+ggsave("./145044_20100428_indices/python/images/ndvi.tif",
+       device='tiff',
+       plot = ndvi,
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+```{r}
+length(labels)
+```
+
+#### nbr
+
+```{r}
+nbr_raster<- read_stars("./145044_20100428_indices/python/145044_20100428_nbr.tif")
+plot(nbr_raster)
+
+```
+
+```{r}
+## nbr plotting
+
+
+breaks = c(-.6, 0, .1,.2, .4, .6, .8,1)
+
+breaks = unname(quantile(nbr_raster[["145044_20100428_nbr.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+
+breaks = append(breaks, c(.200000), after = 10)
+nbr <- ggplot()+
+  geom_stars(data = nbr_raster, downsample = 2)+
+  theme_for_map +
+
+  scale_fill_fermenter( palette = "Spectral",breaks = round(breaks,2) , na.value=NA , direction = 1)+
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = 'NBR')
+# 
+ggsave("./145044_20100428_indices/python/images/nbr.tif",
+        device='tiff',
+        plot = nbr,
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+#### gemi
+
+```{r}
+gemi_raster<- read_stars("./145044_20100428_indices/python/145044_20100428_GEMI.tif")
+plot(gemi_raster)
+
+```
+
+```{r}
+## gemi plotting
+
+breaks = c( 0, .2,.3,.35, .4,.45,.5, 1)
+
+breaks = unname(quantile(gemi_raster[["145044_20100428_gemi.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+breaks = append(breaks, c(0.3131032), after = 0.3331032)
+  
+gemi <- ggplot()+
+  geom_stars(data = gemi_raster, downsample = 2)+
+    scale_fill_fermenter(breaks = round(breaks,2), palette = 'Spectral', direction =1, na.value =NA)+
+    theme_for_map+
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = 'GEMI')
+
+ggsave("./145044_20100428_indices/python/images/gemi.tif",
+        device='tiff',
+        plot = gemi,
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+#### bai
+
+```{r}
+bai_raster<- read_stars("./145044_20100428_indices/python/145044_20100428_bai.tif")
+plot(bai_raster)
+
+```
+
+```{r}
+breaks = unname(quantile(bai_raster[["145044_20100428_bai.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+
+breaks = append(breaks, c(500), after =10)
+bai <- ggplot()+
+  geom_stars(data = bai_raster, downsample = 2)+
+   scale_fill_fermenter(breaks = round(breaks), palette = "Spectral", na.value = NA)+
+  theme_for_map +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = "BAI")
+
+ggsave("./145044_20100428_indices/python/images/bai.tif",
+       plot = bai,
+        device='tiff',
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+#### baiml
+
+```{r}
+baiml_raster<- read_stars("./145044_20100428_indices/python/145044_20100428_baiml.tif")
+plot(baiml_raster)
+
+```
+
+```{r}
+breaks = unname(quantile(baiml_raster[["145044_20100428_baiml.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+
+#breaks = append(breaks, c(500), after = 1.220539e+06)
+baiml <- ggplot()+
+  geom_stars(data = baiml_raster, downsample = 2)+
+   scale_fill_fermenter(breaks = round(breaks), palette = "Spectral", na.value = NA)+
+  theme_for_map +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = "BAIML")
+
+ggsave("./145044_20100428_indices/python/images/baiml.tif",
+       plot = baiml,
+             device='tiff',
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+#### baims
+
+```{r}
+baims_raster<- read_stars("./145044_20100428_indices/python/145044_20100428_baims.tif")
+plot(baims_raster)
+
+```
+
+```{r}
+breaks = unname(quantile(baims_raster[["145044_20100428_baims.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+
+breaks[10] <- 50
+
+#breaks = append(breaks, c(500), after = 1.220539e+06)
+baims <- ggplot()+
+  geom_stars(data = baims_raster, downsample = 2)+
+   scale_fill_fermenter(breaks = round(breaks), palette = "Spectral", na.value = NA)+
+  theme_for_map +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = 'BAIMS')
+
+ggsave("./145044_20100428_indices/python/images/baims.tif",
+       plot = baims,
+        device='tiff',
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+#### ndmi
+
+```{r}
+ndmi_raster<- read_stars("./145044_20100428_indices/python/145044_20100428_ndmi.tif")
+plot(ndmi_raster)
+
+```
+
+```{r}
+breaks = unname(quantile(ndmi_raster[["145044_20100428_ndmi.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+#breaks = c(-.6, 0, .1,.2, .4, .6, .8,1)
+
+#breaks[10] <- 50
+
+#breaks = append(breaks, c(500), after = 1.220539e+06)
+ndmi <- ggplot()+
+  geom_stars(data = ndmi_raster, downsample = 2)+
+   scale_fill_fermenter(breaks = round(breaks,2), palette = "Spectral", na.value = NA, direction = 1)+
+  theme_for_map +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = 'NDMI')
+
+ggsave("./145044_20100428_indices/python/images/ndmi.tif",
+       plot = ndmi,
+        device='tiff',
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+#### mirbi
+
+```{r}
+mirbi_raster<- read_stars("./145044_20100428_indices/python/145044_20100428_mirbi.tif")
+plot(mirbi_raster)
+
+```
+
+```{r}
+breaks = unname(quantile(mirbi_raster[["145044_20100428_mirbi.tif"]],  na.rm = TRUE, probs = seq(0, 1,.1)))
+#breaks = c(-.6, 0, .1,.2, .4, .6, .8,1)
+
+#breaks[10] <- 50
+
+#breaks = append(breaks, c(4), after = 10)
+mirbi <- ggplot()+
+  geom_stars(data = mirbi_raster, downsample = 2)+
+   scale_fill_fermenter(breaks = round(breaks,2), palette = "Spectral", na.value = NA, direction = -1)+
+  theme_for_map +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = 'MIRBI')
+
+ggsave("./145044_20100428_indices/python/images/mirbi.tif",
+       plot = mirbi,
+        device='tiff',
+        width = 4.5, height = 4,
+       dpi = 300,
+       bg='#ffffff')
+```
+
+<!-- ```{r} -->
+
+<!-- library(patchwork) -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+
+<!--    scale_fill_stepsn(breaks = c(-.6, 0, .1,.2, .4, .6, .8,1), colours = 'spectral', limits = c(-.6,1),show.limits = TRUE) -->
+
+<!--    scale_fill_stepsn(breaks = c(-.6, 0, .1,.2, .4, .6, .8,1), colours = viridis::viridis(8), limits = c(-.6,1),show.limits = TRUE) -->
+
+<!--   scale_fill_continuous(limits = c(-.6, 1), breaks = c( -.6,0,.5,1), ) -->
+
+<!--   scale_fill_continuous(breaks = c( 0, .5)) -->
+
+<!--   guides(colour = guide_coloursteps(show.limits = TRUE)) -->
+
+<!--   scale_fill_stepsn(breaks = c(-.6, 0, .2, .4, .6, .8,1) colours = viridis::viridis(breaks), limits = c(-.6,1),show.limits = TRUE) -->
+
+<!--   scale_fill_binned() -->
+
+<!--   scale_fill_gradientn(colours = c("white", "lightcyan", "steelblue4"), values = c(0,0.1,1)) -->
+
+<!--  scale_fill_manual(values = c("red", "blue", "green"), -->
+
+<!--     breaks = c(-1, 1)) -->
+
+<!--   scale_fill_gradientn(colours = c("midnightblue", "skyblue1",  -->
+
+<!--                                    "grey", "black"), -->
+
+<!--                        values = scales::rescale(c(min, -0.1,  -->
+
+<!--                                                 0, max))) -->
+
+<!--   theme_for_map + -->
+
+<!--   scale_fill_fermenter(palette = 'Spectral', breaks = c(-1.5,0,.1, .2, .3, .35,.4,.5,1.2)) -->
+
+<!--   scale_fill_viridis_c(option = "D", direction = -1) -->
+
+<!--   #scale_fill_stepsn( colors =viridis::viridis(7) ) -->
+
+<!--   scale_fill_fermenter(palette = 'spectral',show.limits = TRUE,na.value=NA,direction = -1 )+ -->
+
+<!--     min = min(gemi_raster[["145044_20100428_gemi.tif"]], na.rm = TRUE) -->
+
+<!-- max = max(gemi_raster[["145044_20100428_gemi.tif"]], na.rm = TRUE) -->
+
+<!-- scale_fill_divergent_( -->
+
+<!--     high = "#7f3b08", -->
+
+<!--     mid = "#f7f7f7", -->
+
+<!--     low = "#2d004b", -->
+
+<!--     name = "mean sea leavel pressure (hPa) \n \n ", -->
+
+<!--     midpoint = 0 -->
+
+<!--   )  -->
+
+<!--    scale_fill_distiller(palette = "PuBuGn", direction = 1) -->
+
+<!--   scale_fill_distiller(palette = "YlOrRd", direction = 1) -->
+
+<!--   scale_fill_viridis(option = "D")  -->
+
+<!--   scale_fill_gradient(low = 'yellow', high = 'red') -->
+
+<!--   scale_fill_fermenter(palette = 'Spectral', breaks = breaks,direction = -1) -->
+
+<!--    scale_fill_continuous(trans = "sqrt") -->
+
+<!--    scale_fill_gradient(trans = 'log',low = 'yellow', high = 'red') -->
+
+<!--    scale_fill_fermenter(palette = "Spectral", breaks = breaks,direction = 1, -->
+
+<!--                         show.limits = TRUE,  na.value=NA)+ -->
+
+<!--   scale_x_continuous(expand = c(0, 0)) +  -->
+
+<!--   scale_y_continuous(expand = c(0, 0)) -->
+
+<!-- scale_fill_stepsn(n.breaks = 12, colours = terrain.colors(12)) -->
+
+<!--   scale_fill_steps(n.breaks = length(breaks)) -->
+
+<!--   scale_fill_fermenter(n.breaks = 9, palette = "Spectral",breaks = c(-.6, 0, .1,.2, .4, .6, .8,1),show.limits = TRUE,  limits = c(-.6,1),na.value=NA)+ -->
+
+<!--   theme( -->
+
+<!--     legend.title = element_blank()  -->
+
+<!--   ) -->
+
+<!-- ### -->
+
+<!--   as.data.frame(gemi_raster, xy = TRUE)  -->
+
+<!-- ``` -->
