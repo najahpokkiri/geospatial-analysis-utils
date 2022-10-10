@@ -9,7 +9,7 @@ var image = ee.ImageCollection("LANDSAT/LT05/C01/T1_TOA")
   .filter(ee.Filter.eq('WRS_PATH', 145))
   //.filter(ee.Filter.eq('WRS_ROW', 45))
   .median();
-var bai = image.expression(
+var bai = image.expression( 
     '1/((0.02-red)**2+(0.05-nir)**2)', {
       'nir': image.select('B4'),
       'red': image.select('B3'),
