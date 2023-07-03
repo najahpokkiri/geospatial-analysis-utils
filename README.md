@@ -17,7 +17,7 @@ Frontiers in Forests and Global Change, 5.
 
 - `indices_visualisation.R`: This script beautifully visualizes the indices created in Python, ENVI, or any output in the `.tiff` format using the `ggplot2` package in R.
 - `raster_reprojection.py`: This script reprojects a raster file to the CRS of another selected file using the `rasterio` library in Python.
-- `spectral_indices_creation.ipynb`: This notebook demonstrates how to create different spectral indices from a satellite imagery
+- `spectral_indices_creation.ipynb`: This notebook demonstrates how to create different spectral indices from a satellite image.
 - ...
 
 ## Usage
