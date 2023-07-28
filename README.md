@@ -1,6 +1,6 @@
 # Scripts from my geospatial work
 
-This repository contains a collection of scripts that I wrote for geospatial tasks at different organisations. These scripts cover various aspects of climate change research, data analysis, and geospatial processing. 
+This repository contains a collection of scripts and notebooks that I wrote for geospatial analyses at different organisations. These scripts cover various aspects of climate change research, data analysis, and geospatial processing. 
 
 
 
