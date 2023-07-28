@@ -1,16 +1,7 @@
-# Scripts from my work at the Centre for Climate Change and Sustainability (3cs)
+# Scripts from my geospatial work
 
-This repository contains a collection of scripts that I wrote during my work at the Centre for Climate Change (3cs) at Ashoka University. These scripts cover various aspects of climate change research, data analysis, and geospatial processing. 
+This repository contains a collection of scripts that I wrote for geospatial tasks at different organisations. These scripts cover various aspects of climate change research, data analysis, and geospatial processing. 
 
-## Paper Reference
-
-During my time at the Centre for Climate Change (3cs), I worked on a research project that resulted in the following paper:
-
-**Evaluating methods to map burned area at 30-meter resolution in forests and agricultural areas of Central India** \[2022\]
-
-Chandel, A., Sarwat, W., Najah, A., Dhanagare, S., & Agarwala, M.  
-Frontiers in Forests and Global Change, 5.  
-[Link to Paper](https://www.frontiersin.org/articles/10.3389/ffgc.2022.933807/full)
 
 
 ## Scripts
