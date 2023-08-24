@@ -11,7 +11,7 @@ This repository contains a collection of scripts and notebooks that I wrote for 
 - `spectral_indices_creation.ipynb`: This notebook demonstrates how to create different spectral indices from a satellite image.
 - `indices_visualisation.R`: This script beautifully visualizes the indices created in Python, ENVI, or any output in the `.tiff` format using the `ggplot2` package in R.
 
-- `ML_workflow_BA`: This notebook demonstrates the full workflow for predicting bruned area over landsat image using `scikit-learn`
+- `night_light_change_estimation.py`: This script lets you track the difference in night light intensity for two different years (1992-2013) for any given shapefiles.
 
 - ...
 
